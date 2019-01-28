@@ -83,13 +83,21 @@ func xml2RPC(xmlraw string, rpc interface{}) error {
 // getFaultResponse converts faultValue to Fault.
 func getFaultResponse(fault faultValue) Fault {
 	var (
-		code int
+		code string
 		str  string
 	)
 
 	for _, field := range fault.Value.Struct {
 		if field.Name == "faultCode" {
-			code, _ = strconv.Atoi(field.Value.Int)
+			if i := field.Value.Int; i != "" {
+				code = i
+			}
+			if s := field.Value.String; s != "" {
+				code = s
+			}
+			if code == "" {
+				code = field.Value.Raw
+			}
 		} else if field.Name == "faultString" {
 			str = field.Value.String
 			if str == "" {

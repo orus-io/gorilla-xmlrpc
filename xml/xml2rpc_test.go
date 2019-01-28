@@ -119,8 +119,8 @@ Requiredattribute'user'notfound:
 	if !ok {
 		t.Errorf("error should be of concrete type Fault, but got %v", err)
 	} else {
-		if fault.Code != 116 {
-			t.Errorf("expected fault.Code to be %d, but got %d", 116, fault.Code)
+		if fault.Code != "116" {
+			t.Errorf("expected fault.Code to be %d, but got %s", 116, fault.Code)
 		}
 		if fault.String != errstr {
 			t.Errorf("fault.String should be:\n\n%s\n\nbut got:\n\n%s\n", errstr, fault.String)
@@ -146,11 +146,53 @@ Requiredattribute'user'notfound:
 	if !ok {
 		t.Errorf("error should be of concrete type Fault, but got %v", err)
 	} else {
-		if fault.Code != 116 {
-			t.Errorf("expected fault.Code to be %d, but got %d", 116, fault.Code)
+		if fault.Code != "116" {
+			t.Errorf("expected fault.Code to be %d, but got %s", 116, fault.Code)
 		}
 		if fault.String != errstr {
 			t.Errorf("fault.String should be:\n\n%s\n\nbut got:\n\n%s\n", errstr, fault.String)
 		}
+	}
+}
+
+func TestGetFaultResponse(t *testing.T) {
+	for _, tt := range []struct {
+		name       string
+		faultValue faultValue
+		expected   Fault
+	}{
+		{"int code only",
+			faultValue{Value: value{Struct: []member{
+				{Name: "faultCode", Value: value{Int: "911"}},
+			}}},
+			Fault{"911", ""},
+		},
+		{"string code and string",
+			faultValue{Value: value{Struct: []member{
+				{Name: "faultCode", Value: value{String: "Some code"}},
+				{Name: "faultString", Value: value{String: "Some error"}},
+			}}},
+			Fault{"Some code", "Some error"},
+		},
+		{"empty code string",
+			faultValue{Value: value{Struct: []member{
+				{Name: "faultCode", Value: value{String: ""}},
+				{Name: "faultString", Value: value{String: "Some error"}},
+			}}},
+			Fault{"", "Some error"},
+		},
+		{"no code",
+			faultValue{Value: value{Struct: []member{
+				{Name: "faultString", Value: value{String: "Some error"}},
+			}}},
+			Fault{"", "Some error"},
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			fault := getFaultResponse(tt.faultValue)
+			if fault != tt.expected {
+				t.Errorf("Expected fault=%v, got %v", tt.expected, fault)
+			}
+		})
 	}
 }

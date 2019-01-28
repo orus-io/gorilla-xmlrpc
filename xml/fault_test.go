@@ -58,8 +58,8 @@ func TestFaults(t *testing.T) {
 	if !ok {
 		t.Fatal("expected error to be of concrete type Fault, but got", err)
 	}
-	if fault.Code != -32602 {
-		t.Errorf("wrong fault code: %d", fault.Code)
+	if fault.Code != "-32602" {
+		t.Errorf("wrong fault code: %s", fault.Code)
 	}
 	if fault.String != "Wrong Arguments Number" {
 		t.Errorf("wrong fault string: %s", fault.String)
@@ -74,8 +74,8 @@ func TestFaults(t *testing.T) {
 	if !ok {
 		t.Fatal("expected error to be of concrete type Fault, but got", err)
 	}
-	if fault.Code != -32602 {
-		t.Errorf("wrong fault code: %d", fault.Code)
+	if fault.Code != "-32602" {
+		t.Errorf("wrong fault code: %s", fault.Code)
 	}
 
 	if !strings.HasPrefix(fault.String, "Invalid Method Parameters: fields type mismatch") {
